@@ -22,7 +22,6 @@ We made some fixes to pg_hint_plan to better support the leading hint of prefixe
 ### 2. Install pg_hint_plan
     ```sh
     cd postgresql-12.1/pg_hint_plan-REL12_1_3_6/
-    ./configure --prefix=/usr/local/pgsql --with-segsize=16 --with-blocksize=32 --with-wal-segsize=64 --with-wal-blocksize=64 --with-libedit-preferred  --with-python --with-openssl --with-libxml --with-libxslt --enable-thread-safety --enable-nls=en_US.UTF-8
     make
     make install
     ```
