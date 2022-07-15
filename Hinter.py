@@ -99,12 +99,13 @@ class Hinter:
                 leading_time_flag = pgrunner.getCost(sql = chosen_leading_pair[1]+sql)
                 self.hinter_runtime_list.append(leading_time_flag[0])
                 ##To do: parallel planning
-                self.hinter_planningtime_list.append(pgrunner.getCostPlanJson(sql = chosen_leading_pair[1]+sql))['Planning Time']
+                self.hinter_planningtime_list.append(pgrunner.getCostPlanJson(sql = chosen_leading_pair[1]+sql)['Planning Time'])
             else:
-                leading_time_flag = pgrunner.getLatency(sql = chosen_leading_pair[1]+sql, timeout = max_time_out)
+                plan_json  = pgrunner.getAnalysePlanJson(sql = chosen_leading_pair[1]+sql)
+                leading_time_flag = (plan_json['Plan']['Actual Total Time'],plan_json['timeout'])
                 self.hinter_runtime_list.append(leading_time_flag[0])
                 ##To do: parallel planning
-                self.hinter_planningtime_list.append(pgrunner.getAnalysePlanJson(sql = chosen_leading_pair[1]+sql))['Planning Time']
+                self.hinter_planningtime_list.append(plan_json['Planning Time'])
             
             self.knn.insertAValue((chosen_leading_pair[0],self.value_extractor.encode(leading_time_flag[0])-chosen_leading_pair[0][0]))
             if config.cost_test_for_debug:
@@ -138,7 +139,8 @@ class Hinter:
                 pg_time_flag = pgrunner.getLatency(sql=sql,timeout = 300*1000)
                 self.hinter_runtime_list.append(pg_time_flag[0])
                 ##To do: parallel planning
-                self.hinter_planningtime_list.append(pgrunner.getAnalysePlanJson(sql = sql))['Planning Time']
+
+                self.hinter_planningtime_list.append(pgrunner.getAnalysePlanJson(sql = sql)['Planning Time'])
             self.knn.insertAValue((plan_times[0],self.value_extractor.encode(pg_time_flag[0])-plan_times[0][0]))
             self.samples_plan_with_time.append([plan_json_PG,pg_time_flag[0],mask])
             self.hinter_time_list.append([pg_time_flag[0]])
@@ -159,35 +161,15 @@ class Hinter:
                 loss1 = self.mcts_searcher.optimize()
             if loss>3:
                 loss=  self.model.optimize()[0]
+                loss1 = self.mcts_searcher.optimize()
+            if loss>3:
+                loss=  self.model.optimize()[0]
+                loss1 = self.mcts_searcher.optimize()
         
 
-
-        # self.pg_planningtime_list = []
-        # self.pg_runningtime_list = [] #default pg running time
-        
-        # self.mcts_time_list = []#time for mcts
-        # self.hinter_planningtime_list = [] #chosen hinter running time,include the timeout
-        # self.MHPE_time_list = []
-        # self.hinter_runtime_list = []
-        
-        # self.chosen_plan = []#eg((leading ,pg))
-        # self.hinter_time_list = []#final plan((eg [(leading,),(leading,pg),...]))
-
-
-        # pg_plan_time,pg_latency,mcts_time,hinter_plan_time,MPHE_time,hinter_latency,actual_plans,actual_time
         assert len(set([len(self.hinter_runtime_list),len(self.pg_runningtime_list),len(self.mcts_time_list),len(self.hinter_planningtime_list),len(self.MHPE_time_list),len(self.hinter_runtime_list),len(self.chosen_plan),len(self.hinter_time_list)]))==1
         return self.pg_planningtime_list[-1],self.pg_runningtime_list[-1],self.mcts_time_list[-1],self.hinter_planningtime_list[-1],self.MHPE_time_list[-1],self.hinter_runtime_list[-1],self.chosen_plan[-1],self.hinter_time_list[-1]
-        
-    def predictWithUncertainty(self,plan_jsons,sql_vec):
-        sql_feature = self.model.value_network.sql_feature(sql_vec)
-        res = []
-        raise
-        for plan_json in plan_jsons:
-            tree_feature = self.model.tree_builder.plan_to_feature_tree(plan_json)
-            multi_value = self.model.plan_to_value(tree_feature=tree_feature,sql_feature = sql_feature).detach()
-            mean,variance  = self.model.mean_and_variance(multi_value=multi_value[:,:config.head_num])
-            res.append((mean,variance,self.value_extractor.decode(multi_value[:,config.head_num].item())))
-        return res        
+
     def predictWithUncertaintyBatch(self,plan_jsons,sql_vec):
         sql_feature = self.model.value_network.sql_feature(sql_vec)
         import torchfold

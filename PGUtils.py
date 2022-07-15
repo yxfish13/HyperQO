@@ -81,6 +81,7 @@ class PGGRunner:
             raise
         except:
             plan_json = {}
+            plan_json['Planning Time'] = 20
             plan_json['Plan'] = {'Actual Total Time':config.max_time_out}
             plan_json['timeout'] = True
             self.con.commit()
