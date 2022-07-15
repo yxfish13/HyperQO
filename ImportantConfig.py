@@ -21,7 +21,7 @@ class Config:
         self.var_weight = 0.00 #for au, 0:disable,0.01:enable
         self.max_column = 100
         self.max_alias_num  = 40
-        self.cost_test_for_debug = True
+        self.cost_test_for_debug = False
         self.max_hint_num = 20
         self.max_time_out = 120*1000
         self.threshold = log(2)/log(self.max_time_out)
