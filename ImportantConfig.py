@@ -10,7 +10,7 @@ class Config:
         self.dataset = 'JOB'
         self.userName = self.user
         self.usegpu = True
-        self.head_num = 8
+        self.head_num = 10
         self.input_size = 9
         self.hidden_size = 64
         self.batch_size = 256
@@ -24,15 +24,15 @@ class Config:
         self.cost_test_for_debug = False
         self.max_hint_num = 20
         self.max_time_out = 120*1000
-        self.threshold = log(2)/log(self.max_time_out)
+        self.threshold = log(3)/log(self.max_time_out)
         self.leading_length = 2
         self.try_hint_num = 3
         self.mem_size = 2000
         self.mcts_v = 1.1
         self.mcts_input_size = self.max_alias_num*self.max_alias_num+self.max_column
-        self.searchFactor = 8
+        self.searchFactor = 4
         self.U_factor = 0.0
-        self.log_file = 'log_c3_h64_s8.txt'
+        self.log_file = 'log_c3_h64_s4_t3.txt'
         self.latency_file = 'latency_record.txt'
         self.queries_file = 'workload/JOB_static.json'
         self.id2aliasname = {0: 'start', 1: 'chn', 2: 'ci', 3: 'cn', 4: 'ct', 5: 'mc', 6: 'rt', 7: 't', 8: 'k', 9: 'lt', 10: 'mk', 11: 'ml', 12: 'it1', 13: 'it2', 14: 'mi', 15: 'mi_idx', 16: 'it', 17: 'kt', 18: 'miidx', 19: 'at', 20: 'an', 21: 'n', 22: 'cc', 23: 'cct1', 24: 'cct2', 25: 'it3', 26: 'pi', 27: 't1', 28: 't2', 29: 'cn1', 30: 'cn2', 31: 'kt1', 32: 'kt2', 33: 'mc1', 34: 'mc2', 35: 'mi_idx1', 36: 'mi_idx2', 37: 'an1', 38: 'n1', 39: 'a1'}
